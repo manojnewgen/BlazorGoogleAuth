@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BlazorGoogleAuth.bundle.scp.css",
+      "PackagePath": "staticwebassets\\BlazorGoogleAuth.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BlazorGoogleAuth.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.BlazorGoogleAuth.props",
+      "PackagePath": "build\\BlazorGoogleAuth.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.BlazorGoogleAuth.props",
+      "PackagePath": "buildMultiTargeting\\BlazorGoogleAuth.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.BlazorGoogleAuth.props",
+      "PackagePath": "buildTransitive\\BlazorGoogleAuth.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

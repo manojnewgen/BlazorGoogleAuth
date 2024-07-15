@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js"
+    },
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth.Client\\obj\\Debug\\net8.0\\compressed\\cr30hzikc0.gz",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js.gz"
+    },
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth.Client\\wwwroot\\appsettings.Development.json",
+      "PackagePath": "staticwebassets\\appsettings.Development.json"
+    },
+    {
+      "Id": "C:\\DotnetProjects\\BlazorGoogleAuth\\BlazorGoogleAuth.Client\\wwwroot\\appsettings.json",
+      "PackagePath": "staticwebassets\\appsettings.json"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BlazorGoogleAuth.Client.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.BlazorGoogleAuth.Client.props",
+      "PackagePath": "build\\BlazorGoogleAuth.Client.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.BlazorGoogleAuth.Client.props",
+      "PackagePath": "buildMultiTargeting\\BlazorGoogleAuth.Client.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.BlazorGoogleAuth.Client.props",
+      "PackagePath": "buildTransitive\\BlazorGoogleAuth.Client.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
