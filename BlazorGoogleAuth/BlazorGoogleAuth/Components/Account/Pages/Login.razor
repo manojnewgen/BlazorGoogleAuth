@@ -1,6 +1,8 @@
 ﻿@page "/Account/Login"
 
 @using System.ComponentModel.DataAnnotations
+@using BlazorServerApp.Data
+@using BlazorServerApp.Services
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
@@ -11,7 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 @* @attribute [AllowAnonymous] *@
-
+@inject IUserService UserService
 <PageTitle>Log in</PageTitle>
 
 <h1>Log in</h1>
@@ -91,23 +93,28 @@
     {
         // This doesn't count login failures towards account lockout
         // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        // var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        var result = await UserService.LoginAsync(new User() { EmailAddress = Input.Email, Password = Input.Password });
+
+
         if (result.Succeeded)
         {
+            ApplicationUser user = new ApplicationUser() { Email = Input.Email };
             Logger.LogInformation("User logged in.");
             RedirectManager.RedirectTo(ReturnUrl);
+            //await SignInManager.SignInAsync(user, Input.RememberMe);
         }
-        else if (result.RequiresTwoFactor)
-        {
-            RedirectManager.RedirectTo(
-                "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-        }
-        else if (result.IsLockedOut)
-        {
-            Logger.LogWarning("User account locked out.");
-            RedirectManager.RedirectTo("Account/Lockout");
-        }
+        // else if (result.RequiresTwoFactor)
+        // {
+        //     RedirectManager.RedirectTo(
+        //         "Account/LoginWith2fa",
+        //         new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+        // }
+        // else if (result.IsLockedOut)
+        // {
+        //     Logger.LogWarning("User account locked out.");
+        //     RedirectManager.RedirectTo("Account/Lockout");
+        // }
         else
         {
             errorMessage = "Error: Invalid login attempt.";

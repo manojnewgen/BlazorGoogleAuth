@@ -170,3 +170,5 @@ C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth\obj\Debug\net8.0\BlazorGoogl
 C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth\obj\Debug\net8.0\ref\BlazorGoogleAuth.dll
 C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.Google.dll
 C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.MicrosoftAccount.dll
+C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth\obj\Debug\net8.0\BlazorGoogleAuth.sourcelink.json
+C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth\bin\Debug\net8.0\Newtonsoft.Json.dll

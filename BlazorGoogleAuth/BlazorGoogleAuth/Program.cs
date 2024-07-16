@@ -2,6 +2,8 @@ using BlazorGoogleAuth.Client.Pages;
 using BlazorGoogleAuth.Components;
 using BlazorGoogleAuth.Components.Account;
 using BlazorGoogleAuth.Data;
+using BlazorServerApp.Data;
+using BlazorServerApp.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +16,16 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+//var appSettingSection = builder.Configuration.GetSection("/*AppSettings*/");
+//builder.Services.Configure<AppSettings>(appSettingSection);
+
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("ApiSettings"));
+builder.Services.AddHttpClient<IUserService, UserService>();
+
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider<ApplicationUser>>();
 
 /*builder.Services.AddAuthentication(options =>
     {

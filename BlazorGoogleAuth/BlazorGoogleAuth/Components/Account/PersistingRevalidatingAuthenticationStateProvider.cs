@@ -14,14 +14,12 @@ namespace BlazorGoogleAuth.Components.Account
     // This is a server-side AuthenticationStateProvider that revalidates the security stamp for the connected user
     // every 30 minutes an interactive circuit is connected. It also uses PersistentComponentState to flow the
     // authentication state to the client which is then fixed for the lifetime of the WebAssembly application.
-    internal sealed class PersistingRevalidatingAuthenticationStateProvider : RevalidatingServerAuthenticationStateProvider
+    internal  class PersistingRevalidatingAuthenticationStateProvider<Tuser> : RevalidatingServerAuthenticationStateProvider where Tuser : class
     {
         private readonly IServiceScopeFactory scopeFactory;
         private readonly PersistentComponentState state;
         private readonly IdentityOptions options;
-
         private readonly PersistingComponentStateSubscription subscription;
-
         private Task<AuthenticationState>? authenticationStateTask;
 
         public PersistingRevalidatingAuthenticationStateProvider(
@@ -46,11 +44,21 @@ namespace BlazorGoogleAuth.Components.Account
         {
             // Get the user manager from a new scope to ensure it fetches fresh data
             await using var scope = scopeFactory.CreateAsyncScope();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+           // var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Tuser>>();
             return await ValidateSecurityStampAsync(userManager, authenticationState.User);
         }
+        public async Task UpdateAuthenticationStateAsync(AuthenticationState authenticationState)
+        {
+            NotifyAuthenticationStateChanged(Task.FromResult(authenticationState));
+            //AuthenticationStateChanged?.invoke(Task);
+           // (AuthenticationState as RevalidatingServerAuthenticationStateProvider).NotifyAuthenticationStateChanged(Task.FromResult(authenticationState));
+           // OnAuthenticationStateChanged(Task.FromResult(authenticationState));
 
-        private async Task<bool> ValidateSecurityStampAsync(UserManager<ApplicationUser> userManager, ClaimsPrincipal principal)
+
+        }
+
+        private async Task<bool> ValidateSecurityStampAsync(UserManager<Tuser> userManager, ClaimsPrincipal principal)
         {
             var user = await userManager.GetUserAsync(principal);
             if (user is null)
@@ -86,8 +94,8 @@ namespace BlazorGoogleAuth.Components.Account
 
             if (principal.Identity?.IsAuthenticated == true)
             {
-                var userId = principal.FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value;
-                var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
+                var userId = principal.FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value??"myname";
+                var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value??"mann";
 
                 if (userId != null && email != null)
                 {
