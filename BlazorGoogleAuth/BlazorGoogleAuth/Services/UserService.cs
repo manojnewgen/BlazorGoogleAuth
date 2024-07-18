@@ -14,6 +14,9 @@ using BlazorGoogleAuth.Data;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
+using BlazorGoogleAuth.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using BlazorGoogleAuth.Services;
 
 namespace BlazorServerApp.Services
 {
@@ -23,8 +26,13 @@ namespace BlazorServerApp.Services
         private readonly AppSettings _appSettings;
         private readonly AuthenticationStateProvider _authStateProvider;
         private readonly IAuthorizationService _authorizationService;
+        private readonly HybridAuthState _hybridAuthState;
+        private readonly EntrustAuthService _entrustAuthService;
+        private readonly ILogger<UserService> _logger;
+        private readonly HybridAuthService _hybridAuthService;
 
-        public UserService(HttpClient httpClient, IOptions<AppSettings> appSettings, AuthenticationStateProvider authStateProvider, IAuthorizationService authorizationService)
+
+        public UserService(HttpClient httpClient, IOptions<AppSettings> appSettings, AuthenticationStateProvider authStateProvider, IAuthorizationService authorizationService, HybridAuthState hybridAuthState, EntrustAuthService entrustAuthService, ILogger<UserService> logger, HybridAuthService hybridAuthService)
         {
             _httpClient = httpClient;
             _appSettings = appSettings.Value;
@@ -32,9 +40,15 @@ namespace BlazorServerApp.Services
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "BlazorServer");
             _authStateProvider = authStateProvider;
             _authorizationService = authorizationService;
+            _hybridAuthState = hybridAuthState;
+            _entrustAuthService = entrustAuthService;
+            _logger = logger;
+            _hybridAuthService=hybridAuthService;
+
+
         }
 
-        public async Task<AuthorizationResult> LoginAsync(User user)
+        public async Task<string> LoginAsync(User user)
         {
             user.username = "manoj";
             var serializedUser = JsonConvert.SerializeObject(user);
@@ -52,11 +66,9 @@ namespace BlazorServerApp.Services
                 string responseBody = await response.Content.ReadAsStringAsync();
                 JObject authResult = JObject.Parse(responseBody);
                 string token = (string)authResult["token"];
-               // await UpdateAuthenticationState(token);
-                var claimsPrincipal = await GetClaimsPrincipalAsync();
-                var authservice= await _authorizationService.AuthorizeAsync(claimsPrincipal, "Admin");
-               
-                return authservice;
+                
+              //  _hybridAuthState.SetAuthenticationState(isAuthenticated: true, new string[] { "Admin", "Dev" });
+                return token;
             }
             else
             {
@@ -68,28 +80,27 @@ namespace BlazorServerApp.Services
             }
         }
 
-        private async Task UpdateAuthenticationState(string token)
+        public async Task<bool> AuthenticateWithEntrust(string username, string password)
         {
-            // Use the PersistingRevalidatingAuthenticationStateProvider to update authentication state
-            var authStateProvider = _authStateProvider as PersistingRevalidatingAuthenticationStateProvider<ApplicationUser>;
-            if (authStateProvider != null)
+            // Call the EntrustAuthService to authenticate with Entrust ID
+            var accessToken = await _entrustAuthService.AuthenticateWithEntraID(username, password);
+           // var isAuthenticated = false;
+
+            if (!string.IsNullOrEmpty(accessToken))
             {
-                var handler = new JwtSecurityTokenHandler();
-                var tokenS = handler.ReadToken(token) as JwtSecurityToken;
-
-                var claims = tokenS.Claims;
-                var identity = new ClaimsIdentity(claims, "apiauth");
-                var user = new ClaimsPrincipal(identity);
-
-
-
-                await authStateProvider.UpdateAuthenticationStateAsync(new AuthenticationState(user));
+               // return accessToken;
+                _hybridAuthService.SetAccessToken(accessToken);
+                _hybridAuthService.SetAuthenticationState(isAuthenticated: true, new string[] { "Admin", "Dev" });
+                return true;
             }
             else
             {
-                throw new InvalidOperationException("AuthenticationStateProvider is not of type PersistingRevalidatingAuthenticationStateProvider.");
+                _logger.LogWarning("Entrust ID authentication failed.");
             }
+
+            return false;
         }
+       
 
         public async Task<User> RegisterUserAsync(User user)
         {
@@ -132,24 +143,5 @@ namespace BlazorServerApp.Services
             return returnedUser;
         }
 
-        private async Task<ClaimsPrincipal> GetClaimsPrincipalAsync()
-        {
-            var authenticationState = await _authStateProvider.GetAuthenticationStateAsync();
-            var claimsPrincipal = authenticationState.User;
-            var claimsIdentity = claimsPrincipal.Identities.First();
-
-            //if (!_webHostEnvironment.IsProduction() && !string.IsNullOrEmpty(_profileProvider?.ConfigurationOverrides?.OktaGroup)
-            //    && AuthConstants.DebugOktaGroupQueryMap.ContainsKey(_profileProvider.ConfigurationOverrides.OktaGroup))
-            //{
-            //    claimsIdentity?.TryRemoveAndAddClaim(AuthConstants.DEFAULT_OKTA_GROUPS_CLAIM_TYPE, AuthConstants.DebugOktaGroupQueryMap[_profileProvider.ConfigurationOverrides.OktaGroup]);
-            //}
-            //else if (!_webHostEnvironment.IsProduction())
-            //{
-            //    claimsIdentity?.TryRemoveAndAddClaim(AuthConstants.DEFAULT_OKTA_GROUPS_CLAIM_TYPE, CrmAdminOktaGroups.SiteAdmin);
-            //}
-            return claimsPrincipal; ;
-        }
-
-        
     }
 }

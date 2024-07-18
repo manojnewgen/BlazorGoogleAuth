@@ -1,43 +1,106 @@
-﻿@using Microsoft.AspNetCore.Authentication
+﻿@page "/external-login-picker"
+@inherits AuthStateComponentBase
+@using BlazorGoogleAuth.Authorization
+@using BlazorServerApp.Data
+@using BlazorServerApp.Services
+@using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using BlazorGoogleAuth.Data
-
-@inject SignInManager<ApplicationUser> SignInManager
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject ILogger<ExternalLoginPicker> Logger
+@inject IUserService UserService
+@inject HybridAuthService HybridAuthService
 
-@if (externalLogins.Length == 0)
+@if (isAuthenticated)
 {
     <div>
         <p>
-            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-            about setting up this ASP.NET application to support logging in via external services</a>.
+            You're already authenticated
         </p>
     </div>
 }
 else
 {
-    <form class="form-horizontal" action="Account/ExternalLogin" method="post">
-        <div>
-            <AntiforgeryToken />
-            <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
-            <p>
-                @foreach (var provider in externalLogins)
-                {
-                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                }
-            </p>
-        </div>
-    </form>
+    <div class="col-md-4">
+        <section>
+            <StatusMessage Message="@errorMessage" />
+            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser1" FormName="login">
+                <DataAnnotationsValidator />
+                <h2>Use a local account to log in.</h2>
+                <hr />
+                <ValidationSummary class="text-danger" role="alert" />
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                    <label for="email" class="form-label">Email</label>
+                    <ValidationMessage For="() => Input.Email" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <label for="password" class="form-label">Password</label>
+                    <ValidationMessage For="() => Input.Password" class="text-danger" />
+                </div>
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in with entra</button>
+                </div>
+            </EditForm>
+        </section>
+    </div>
 }
 
 @code {
-    private AuthenticationScheme[] externalLogins = [];
+    private string? errorMessage;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
+    private AuthenticationScheme[] externalLogins = [];
 
-    protected override async Task OnInitializedAsync()
+    private bool isAuthenticated;
+    private string[] roles;
+
+   
+
+    public async Task LoginUser1()
     {
-        externalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToArray();
+        var isAuthenticated = await UserService.AuthenticateWithEntrust(Input.Email, Input.Password);
+
+        if (isAuthenticated)
+        {
+            await InvokeAsync(() =>
+            {
+                Logger.LogInformation("User logged in.");
+                RedirectManager.RedirectTo(ReturnUrl);
+            });
+        }
+        else
+        {
+            await InvokeAsync(() =>
+            {
+                errorMessage = "Error: Invalid login attempt.";
+                StateHasChanged();
+            });
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [Display(Name = "Remember me?")]
+        public bool RememberMe { get; set; }
     }
 }

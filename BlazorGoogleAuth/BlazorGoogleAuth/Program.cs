@@ -1,7 +1,9 @@
+using BlazorGoogleAuth.Authorization;
 using BlazorGoogleAuth.Client.Pages;
 using BlazorGoogleAuth.Components;
 using BlazorGoogleAuth.Components.Account;
 using BlazorGoogleAuth.Data;
+using BlazorGoogleAuth.Services;
 using BlazorServerApp.Data;
 using BlazorServerApp.Services;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -19,13 +21,33 @@ builder.Services.AddRazorComponents()
 //var appSettingSection = builder.Configuration.GetSection("/*AppSettings*/");
 //builder.Services.Configure<AppSettings>(appSettingSection);
 
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set the session timeout as needed
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; // Make the session cookie essential
+});
+
+builder.Services.AddSingleton<HybridAuthState>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<HybridAuthService>());
+//builder.Services.AddScoped<AuthenticationStateProvider, HybridAuthState>();
+
+builder.Services.AddSingleton<HybridAuthService>();
+builder.Services.AddHttpContextAccessor();
+builder.Configuration.AddUserSecrets<Program>();
+
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("ApiSettings"));
 builder.Services.AddHttpClient<IUserService, UserService>();
+builder.Services.AddScoped<EntrustAuthService>();
+
+
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider<ApplicationUser>>();
+//builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider<ApplicationUser>>();
 
 /*builder.Services.AddAuthentication(options =>
     {
@@ -80,6 +102,11 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+builder.Services.AddServerSideBlazor(options =>
+{
+    options.DetailedErrors = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -87,6 +114,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseMigrationsEndPoint();
+
 }
 else
 {
@@ -99,6 +127,11 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseSession();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

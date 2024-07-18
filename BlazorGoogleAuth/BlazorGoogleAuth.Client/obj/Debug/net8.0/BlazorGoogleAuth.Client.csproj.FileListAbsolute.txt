@@ -1036,3 +1036,4 @@ C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth.Client\obj\Debug\net8.0\comp
 C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth.Client\obj\Debug\net8.0\compressed\mu28iy1251.gz
 C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth.Client\obj\Debug\net8.0\compressed\62tjp8s5vx.gz
 C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth.Client\obj\Debug\net8.0\compressed\a764hrm5cr.gz
+C:\DotnetProjects\BlazorGoogleAuth\BlazorGoogleAuth.Client\obj\Debug\net8.0\BlazorGoogleAuth.Client.sourcelink.json

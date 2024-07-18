@@ -1,0 +1,39 @@
+﻿@using BlazorGoogleAuth.Authorization
+@using System.Security.Claims
+@inherits LayoutComponentBase
+
+@code {
+    [Inject] protected HybridAuthService HybridAuthService { get; set; } = default!;
+
+    protected bool isAuthenticated;
+    protected string[] roles;
+    protected AuthenticationState authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HybridAuthService.AuthenticationStateChanged += HandleAuthenticationStateChanged;
+        await RefreshAuthenticationState();
+        await base.OnInitializedAsync();
+    }
+
+    protected async Task RefreshAuthenticationState()
+    {
+        authState = await HybridAuthService.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity.IsAuthenticated;
+        roles = authState.User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray();
+    }
+
+    private async void HandleAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        await InvokeAsync(async () =>
+        {
+            await RefreshAuthenticationState();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        HybridAuthService.AuthenticationStateChanged -= HandleAuthenticationStateChanged;
+    }
+}
